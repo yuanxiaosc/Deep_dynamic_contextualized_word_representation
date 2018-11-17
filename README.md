@@ -25,6 +25,7 @@ using this [script](https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737c
 
 ## Sentence (and sentence-pair) classification tasks
 
+difference
 ```
 export BERT_BASE_DIR=/path/to/bert/uncased_L-12_H-768_A-12
 export GLUE_DIR=/path/to/glue
@@ -45,6 +46,7 @@ python run_classifier_elmo.py \
 ```
 
 ### Prediction from classifier
+> the same as https://github.com/google-research/bert
 
 ```
 export BERT_BASE_DIR=/path/to/bert/uncased_L-12_H-768_A-12
@@ -63,5 +65,14 @@ python run_classifier_elmo.py \
 ```
 more methods to [google-research/bert](https://github.com/google-research/bert)
 
+
+## Solve [SQUAD1.1]()https://rajpurkar.github.io/SQuAD-explorer/ problem
+
+> the same as https://github.com/google-research/bert
+
+difference
+```
+python run_squad_elmo.py --vocab_file=$BERT_BASE_DIR/vocab.txt --bert_config_file=$BERT_BASE_DIR/bert_config.json --init_checkpoint=$BERT_BASE_DIR/bert_model.ckpt --do_train=True --train_file=$SQUAD_DIR/train-v1.1.json --do_predict=True --predict_file=$SQUAD_DIR/dev-v1.1.json --train_batch_size=12 --learning_rate=3e-5 --num_train_epochs=2.0 --max_seq_length=384 --doc_stride=128 --output_dir=./tmp/elmo_squad_base/
+```
 
 

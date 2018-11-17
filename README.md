@@ -66,7 +66,7 @@ python run_classifier_elmo.py \
 more methods to [google-research/bert](https://github.com/google-research/bert)
 
 
-## Solve [SQUAD1.1]()https://rajpurkar.github.io/SQuAD-explorer/ problem
+## Solve [SQUAD1.1](https://rajpurkar.github.io/SQuAD-explorer/) problem
 
 > the same as https://github.com/google-research/bert
 

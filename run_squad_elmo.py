@@ -520,29 +520,28 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
 
     batch_size = all_encoder_layers[0].shape[0].value
     seq_length = all_encoder_layers[0].shape[1].value
-    hidden_size = all_encoder_layers[0].shape[-1].value
+    hidden_size = all_encoder_layers[0].shape[2].value
 
     ELMo_layer_numbers = 12
     if ELMo_layer_numbers > len(all_encoder_layers):
         ELMo_layer_numbers = len(all_encoder_layers)
 
-    ELMO_sequence_output_list = []
-    with tf.variable_scope("ELMo"):
-        for layer_idx in range(ELMo_layer_numbers):
-            sequence_output = all_encoder_layers[layer_idx]
-            ELMO_sequence_output_list.append(sequence_output)
+    s_task = tf.get_variable(
+        "cls/squad/s_stack", [ELMo_layer_numbers,],
+        initializer=tf.truncated_normal_initializer(stddev=0.02))
+    s_task_weight = tf.nn.softmax(s_task)
 
-        s_task = tf.Variable(tf.random_normal([ELMo_layer_numbers,]), name="s_task_layer_weight")
-        s_task_weight = tf.nn.softmax(s_task)
-        gama_task = tf.Variable(tf.random_normal([]), name="gama_task")
+    gama_task = tf.get_variable(
+        "cls/squad/gama_task", [],
+        initializer=tf.truncated_normal_initializer(stddev=0.01))
 
-        ELMO_weighted_output_list = []
-        for layer_idx in range(ELMo_layer_numbers):
-            sequence_hidden = ELMO_sequence_output_list[layer_idx]
-            s_task_layer = s_task_weight[layer_idx]
-            ELMO_weighted_output_list.append(sequence_hidden * s_task_layer)
+    ELMO_weighted_output_list = []
+    for layer_idx in range(ELMo_layer_numbers):
+        sequence_hidden = all_encoder_layers[layer_idx]
+        s_task_layer = s_task_weight[layer_idx]
+        ELMO_weighted_output_list.append(sequence_hidden * s_task_layer)
 
-        ELMO_weighted_output = tf.reduce_sum(ELMO_weighted_output_list, axis=0) * gama_task
+    ELMO_weighted_output = tf.reduce_sum(ELMO_weighted_output_list, axis=0) * gama_task
 
     final_hidden = ELMO_weighted_output
 
@@ -553,12 +552,18 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     output_bias = tf.get_variable(
         "cls/squad/output_bias", [2], initializer=tf.zeros_initializer())
 
-    final_hidden_matrix = tf.reshape(final_hidden,
-                                     [batch_size * seq_length, hidden_size])
+    if batch_size is None:
+        final_hidden_matrix = tf.reshape(final_hidden, [-1, hidden_size])
+    else:
+        final_hidden_matrix = tf.reshape(final_hidden, [batch_size * seq_length, hidden_size])
     logits = tf.matmul(final_hidden_matrix, output_weights, transpose_b=True)
     logits = tf.nn.bias_add(logits, output_bias)
 
-    logits = tf.reshape(logits, [batch_size, seq_length, 2])
+    if batch_size is None:
+        logits = tf.reshape(logits, [-1, seq_length, 2])
+    else:
+        logits = tf.reshape(logits, [batch_size, seq_length, 2])
+
     logits = tf.transpose(logits, [2, 0, 1])
 
     unstacked_logits = tf.unstack(logits, axis=0)

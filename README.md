@@ -1,5 +1,5 @@
-# Deep_dynamic_word_representation
-TensorFlow code and pre-trained models for DDWR
+# Deep_context_word_representation
+TensorFlow code and pre-trained models for DCWR
 
 # Important explanation
 1. The method of the model is simple, only using the feed forward neural network with attention mechanism.
@@ -75,4 +75,10 @@ difference
 python run_squad_elmo.py --vocab_file=$BERT_BASE_DIR/vocab.txt --bert_config_file=$BERT_BASE_DIR/bert_config.json --init_checkpoint=$BERT_BASE_DIR/bert_model.ckpt --do_train=True --train_file=$SQUAD_DIR/train-v1.1.json --do_predict=True --predict_file=$SQUAD_DIR/dev-v1.1.json --train_batch_size=12 --learning_rate=3e-5 --num_train_epochs=2.0 --max_seq_length=384 --doc_stride=128 --output_dir=./tmp/elmo_squad_base/
 ```
 
+## Experimental Result
+
+```
+python run_squad_elmo.py
+{“exact_match”: 81.20151371807, “f1”: 88.56178500169332}
+```
 

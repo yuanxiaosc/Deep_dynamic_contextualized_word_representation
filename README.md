@@ -1,5 +1,5 @@
-# Deep_context_word_representation
-TensorFlow code and pre-trained models for DCWR
+# Deep dynamic Contextualized word representation (DDCWR)
+TensorFlow code and pre-trained models for DDCWR
 
 # Important explanation
 1. The method of the model is simple, only using the feed forward neural network with attention mechanism.
